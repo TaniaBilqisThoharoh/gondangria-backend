@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Beranda;
 use App\Models\Wahana;
@@ -12,60 +13,63 @@ class BerandaController extends Controller
     public function index()
     {
         $beranda = Beranda::first();
-        $wahana = Wahana::all();
-        $fasilitas = Fasilitas::all();
 
-        return response()->json([
-            'beranda' => $beranda,
-            'wahana' => $wahana,
-            'fasilitas' => $fasilitas,
-        ], 200);
+        return response()->json(
+            $beranda, 200);
     }
 
     public function store(Request $request)
     {
+    $path = $request->file('hero')->move(public_path('images'), $request->file('hero')->getClientOriginalName());
+    
+    $beranda = new Beranda([
+        'hero' => $request->hero
+    ]);
+    $beranda->hero = $path;
+    // Any other fields to be saved here..
+    $beranda->save();
+        
         // Validasi input sesuai kebutuhan Anda
-        $data = $request->validate([
-            'hero' => 'required|string',
-            'wahana_id' => 'nullable|exists:wahanas,id', // Memeriksa apakah ID wahana valid
-            'fasilitas_id' => 'nullable|exists:fasilitas,id', // Memeriksa apakah ID fasilitas valid
-        ]);
+        // $data = $request->validate([
+        //     'hero' => 'required|string'// Memeriksa apakah ID fasilitas valid
+        // ]);
 
-        $beranda = new Beranda([
-            'hero' => $request->input('hero'),
-            'wahana_id' => $request->input('wahana_id'),
-            'fasilitas_id' => $request->input('fasilitas_id'),
-        ]);
+        // $beranda = new Beranda([
+        //     'hero' => $request->input('hero'),
+            
+        // ]);
 
-        $beranda->save();
+        // $beranda->save();
 
-        return response()->json(['message' => 'Beranda created',
-        $data], 201);
+        return response()->json(['message' => 'Beranda created'], 201);
     
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         // Validasi input sesuai kebutuhan Anda
-        $request->validate([
-            'hero' => 'nullable|string',
-            'wahana_id' => 'nullable|exists:wahanas,id', // Memeriksa apakah ID wahana valid
-            'fasilitas_id' => 'nullable|exists:fasilitas,id', // Memeriksa apakah ID fasilitas valid
+        $this->validate($request, [
+            'hero' => 'string'
         ]);
+         $path = $request->file('hero')->move(public_path('images'), $request->file('hero').getClientOriginalName());
+        // $path->move(public_path('images'), $request->file('hero')->getClientOriginalName());
+        
+        $beranda = Beranda::find(11);
 
-        $beranda = Beranda::find($id);
-
-        if (!$beranda) {
-            return response()->json(['message' => 'Beranda not found'], 404);
+        if(!$beranda){
+        return response()->json(['message'=>'Data not found'], 404);       
         }
 
-        $beranda->hero = $request->input('hero');
-        $beranda->wahana_id = $request->input('wahana_id');
-        $beranda->fasilitas_id = $request->input('fasilitas_id');
+        if ($request->hasFile('hero')) {
+            $beranda->nama = $path;
+        }
 
+        // $beranda->hero = $path;
+    // Any other fields to be saved here..
         $beranda->save();
 
-        return response()->json(['message' => 'Beranda updated'], 200);
+        return response()->json(['message' => 'Beranda updated', $path], 200);
+    
     }
 
     public function destroy($id)
@@ -73,7 +77,7 @@ class BerandaController extends Controller
         $beranda = Beranda::find($id);
 
         if (!$beranda) {
-            return response()->json(['message' => 'Beranda not found'], 404);
+            return response()->json(['message' => 'Beranda not found',], 404);
         }
 
         $beranda->delete();
