@@ -50,25 +50,27 @@ class BerandaController extends Controller
     public function update(Request $request)
     {
         // Validasi input sesuai kebutuhan Anda
-        $this->validate($request, [
-            'hero' => 'required'
-        ]);
+        if(response(404)){
+            if($request->hasFile('hero')){
+                dd($request->hero);
+            }
+        }
+        $request->validate(
+            [
+                'hero' => 'string'
+            ]
+        );
+        $path = $request->file('hero');
+        if(!$path){
+            dd($path);
+        }
+        $dest = public_path('images');
+        $path->move($dest . $path->getClientOriginalName());
+         // $path->move(public_path('images'), $request->file('hero')->getClientOriginalName());
         
-        $path = $request->file('hero')->move(public_path('images'), $request->file('hero')->getClientOriginalName());
-        // $path->move(public_path('images'), $request->file('hero')->getClientOriginalName());
-
-        // $file = $request->file('hero');
-        // dd($request->file('hero'));
         
-        // $nama_file = time()."_".$file->getClientOriginalName();
-
-        // $tujuan_upload = public_path('images');
-        // $path = $file->move($tujuan_upload, $nama_file);
-        
-        $beranda = Beranda::find(11);
-
-        if(!$beranda){
-            return response()->json(['message'=>'Data not found'], 404);       
+        if(!$path){
+        return response()->json(['message'=>'Data not found'], 404);       
         }
 
         if ($request->hasFile('hero')) {
@@ -80,7 +82,11 @@ class BerandaController extends Controller
         $beranda->save();
 
         return response()->json(['message' => 'Beranda updated', $path], 200);
-
+        // }else{
+        //     dd($request);
+        // }
+        
+    
     }
 
     public function destroy($id)

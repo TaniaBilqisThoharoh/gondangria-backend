@@ -72,7 +72,7 @@ Route::middleware('jwt.auth')->group(function () {
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 Route::post('logout', [UserController::class, 'logout']);
-Route::post('forgot_password', [UserController::class, 'validateCredentials']);
+Route::post('forgot_password', [UserController::class, 'forgotPassword']);
 Route::put('change_password', [UserController::class, 'changePassword']);
 
 // Rute untuk mendapatkan informasi pengguna saat ini (harus masuk terlebih dahulu)
