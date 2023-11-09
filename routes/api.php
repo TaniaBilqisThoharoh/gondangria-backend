@@ -64,7 +64,7 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get($admin . '/admin/beranda/', [BerandaController::class, 'index']);
     // Route::put($admin . '/admin/beranda/{$id}', [BerandaController::class, 'update']);
     Route::post($admin . '/admin/beranda/store', [BerandaController::class, 'store']);
-    Route::put($admin . '/admin/beranda/update/', [BerandaController::class, 'update']);
+    Route::post($admin . '/admin/beranda/update/', [BerandaController::class, 'update']);
     Route::delete($admin . '/admin/beranda/destroy', [BerandaController::class, 'destroy']);
 });
 

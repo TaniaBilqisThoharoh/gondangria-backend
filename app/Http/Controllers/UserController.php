@@ -55,7 +55,7 @@ class UserController extends Controller {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'expires_in' => JWTAuth::factory()->getTTL() * 24,
         ]);
     }
 
@@ -63,25 +63,25 @@ class UserController extends Controller {
         $credentials = $request->only(['username', 'email']);
         $email = $credentials['email']; // Get the email from the credentials
 
-if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    // Email is valid
-    $user = User::where('email', $email)->first();
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            // Email is valid
+            $user = User::where('email', $email)->first();
 
-    if ($user) {
-        // User with a matching email was found
-        if ($credentials['username'] === $user->username) {
-            // Username matches too
-            return response()->json(['message' => 'Credentials are correct'], 200);
+            if ($user) {
+                // User with a matching email was found
+                if ($credentials['username'] === $user->username) {
+                    // Username matches too
+                    return response()->json(['message' => 'Credentials are correct'], 200);
+                } else {
+                    return response()->json(['message' => 'Incorrect username'], 404);
+                }
+            } else {
+                return response()->json(['message' => 'User not found or incorrect email'], 404);
+            }
         } else {
-            return response()->json(['message' => 'Incorrect username'], 404);
+            // Invalid email format
+            return response()->json(['message' => 'Invalid email format', 'user' => null], 404);
         }
-    } else {
-        return response()->json(['message' => 'User not found or incorrect email'], 404);
-    }
-} else {
-    // Invalid email format
-    return response()->json(['message' => 'Invalid email format', 'user' => null], 404);
-}
     }
 
 
