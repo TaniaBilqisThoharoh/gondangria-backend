@@ -14,11 +14,7 @@ return new class extends Migration
         Schema::create('berandas', function (Blueprint $table) {
             $table->id();
             $table->string('hero');
-            $table->unsignedBigInteger('wahana_id');
-            $table->unsignedBigInteger('fasilitas_id');
             $table->timestamps();
-            $table->foreign('wahana_id')->references('id')->on('wahanas')->onDelete('cascade');
-            $table->foreign('fasilitas_id')->references('id')->on('fasilitas')->onDelete('cascade');
 
         });
     }
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('berandas');
+        Schema::dropIfExists('beranda');
     }
 };

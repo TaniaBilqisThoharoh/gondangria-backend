@@ -10,7 +10,7 @@ use App\Models\Fasilitas;
 class Beranda extends Model
 {
     use HasFactory;
-    protected $fillable = ['hero, wahana_id, fasilitas_id'];
+    protected $fillable = ['hero'];
 
     public function wahana() {
         return $this->belongsToMany(Wahana::class);
