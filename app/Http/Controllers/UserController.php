@@ -17,6 +17,8 @@ class UserController extends Controller {
             'password' => 'required|string|min:6',
         ]);
         $data['password'] = bcrypt($data['password']);
+        
+        
 
         $user = User::create($data);
 
@@ -85,28 +87,31 @@ class UserController extends Controller {
 
 
     public function forgotPassword(Request $request) {
-        $request->only(['email', 'username']);
+        $req = $request->only(['email', 'username']);
     
         $isExist = User::where('username', $request->username)->where('email', $request->email)->first();
-    
+        
         if($isExist){
             return response()->json(['message'=> 'user exists'], 200);
-            $this->respondWithToken($token);
+            
         }else{
+            
             return response()->json(['message'=> 'user not found'], 404);
         }
         }
     
         public function changePassword(Request $request, $id){
-        $new_password = $request->only('new_password');
+            
+        $request->only('new_password');
         
         $user = User::find($id);
-     
-        $user->password = bcrypt($new_password);
+        $user->password = bcrypt($request->new_password);
         
         $user->save();
-        return $response()->json(['message'=>'password successfully changed'], 200);
-        }
+    
+        return response()->json(['message'=>'password successfully changed'], 200);
+        
+    }
 
     public function logout() {
         JWTAuth::invalidate(JWTAuth::getToken());

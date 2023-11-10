@@ -67,13 +67,17 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post($admin . '/admin/beranda/update/', [BerandaController::class, 'update']);
     Route::delete($admin . '/admin/beranda/destroy', [BerandaController::class, 'destroy']);
 });
+Route::prefix('password')->group(function (){
+    Route::post('forgot_password', [UserController::class, 'forgotPassword']);
+    Route::put('change_password/{id}', [UserController::class, 'changePassword']);
+});
+
 
 // Rute untuk Otentikasi
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 Route::post('logout', [UserController::class, 'logout']);
-Route::post('forgot_password', [UserController::class, 'forgotPassword']);
-Route::put('change_password', [UserController::class, 'changePassword']);
+
 
 // Rute untuk mendapatkan informasi pengguna saat ini (harus masuk terlebih dahulu)
 Route::middleware('auth:api')->get('user', 'UserController@getUserInfo');
