@@ -87,9 +87,8 @@ class UserController extends Controller {
 
 
     public function forgotPassword(Request $request) {
-        $req = $request->only(['email', 'username']);
     
-        $isExist = User::where('username', $request->username)->where('email', $request->email)->first();
+        $isExist = User::where('email', $request->email)->first();
         
         if($isExist){
             return response()->json(['message'=> 'user exists'], 200);
