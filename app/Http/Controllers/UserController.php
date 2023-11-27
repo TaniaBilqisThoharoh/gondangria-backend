@@ -17,6 +17,8 @@ class UserController extends Controller {
             'password' => 'required|string|min:6',
         ]);
         $data['password'] = bcrypt($data['password']);
+        
+        
 
         $user = User::create($data);
 
@@ -62,51 +64,52 @@ class UserController extends Controller {
         $credentials = $request->only(['username', 'email']);
         $email = $credentials['email']; // Get the email from the credentials
 
-if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    // Email is valid
-    $user = User::where('email', $email)->first();
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            // Email is valid
+            $user = User::where('email', $email)->first();
 
-    if ($user) {
-        // User with a matching email was found
-        if ($credentials['username'] === $user->username) {
-            // Username matches too
-            return response()->json(['message' => 'Credentials are correct'], 200);
+            if ($user) {
+                // User with a matching email was found
+                if ($credentials['username'] === $user->username) {
+                    // Username matches too
+                    return response()->json(['message' => 'Credentials are correct'], 200);
+                } else {
+                    return response()->json(['message' => 'Incorrect username'], 404);
+                }
+            } else {
+                return response()->json(['message' => 'User not found or incorrect email'], 404);
+            }
         } else {
-            return response()->json(['message' => 'Incorrect username'], 404);
+            // Invalid email format
+            return response()->json(['message' => 'Invalid email format', 'user' => null], 404);
         }
-    } else {
-        return response()->json(['message' => 'User not found or incorrect email'], 404);
-    }
-} else {
-    // Invalid email format
-    return response()->json(['message' => 'Invalid email format', 'user' => null], 404);
-}
     }
 
 
     public function forgotPassword(Request $request) {
-        $request->only(['email', 'username']);
+        $req = $request->only(['email', 'username']);
     
         $isExist = User::where('username', $request->username)->where('email', $request->email)->first();
-    
+        
         if($isExist){
             return response()->json(['message'=> 'user exists'], 200);
-            $this->respondWithToken($token);
+            
         }else{
+            
             return response()->json(['message'=> 'user not found'], 404);
         }
         }
     
         public function changePassword(Request $request, $id){
-        $new_password = $request->only('new_password');
-        
+            
+        $pass = $request->input('pw');
         $user = User::find($id);
-     
-        $user->password = bcrypt($new_password);
-        
+        $user->password = bcrypt($pass);
         $user->save();
-        return $response()->json(['message'=>'password successfully changed'], 200);
-        }
+    
+        return response()->json(['message'=>'password successfully changed'], 200);
+        
+    }
 
     public function logout() {
         JWTAuth::invalidate(JWTAuth::getToken());
