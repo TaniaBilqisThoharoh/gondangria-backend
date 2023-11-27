@@ -10,6 +10,12 @@ use Midtrans\Notification;
 
 class TiketController extends Controller
 {
+
+    public function getPrice(){
+        $tiket = Tiket::all();
+        return response()->json($tiket, 200);
+    }
+    
     public function index()
     {
         $tiket = Tiket::all();
@@ -40,6 +46,18 @@ class TiketController extends Controller
         $snapToken = $transaction->createSnapToken();
 
         return response()->json(['snap_token' => $snapToken], 200);
+    }
+
+    public function storeTiket(Request $request){
+        $tiket = new Tiket([
+            'harga'
+        ]);
+
+        $tiket->harga = $request->input('harga');
+
+        $tiket->save();
+
+        return response()->json(["message"=>"Harga telah ditambahkan"]);
     }
 
     public function notification(Request $request)

@@ -56,7 +56,7 @@ class UserController extends Controller {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 24,
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
         ]);
     }
 
@@ -102,11 +102,9 @@ class UserController extends Controller {
     
         public function changePassword(Request $request, $id){
             
-        $request->only('new_password');
-        
+        $pass = $request->input('pw');
         $user = User::find($id);
-        $user->password = bcrypt($request->new_password);
-        
+        $user->password = bcrypt($pass);
         $user->save();
     
         return response()->json(['message'=>'password successfully changed'], 200);

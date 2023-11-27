@@ -8,7 +8,7 @@ use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\PengunjungController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\BerandaController;
-
+use App\Http\Controllers\HargaTiketController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -53,12 +53,12 @@ Route::middleware('jwt.auth')->group(function () {
     
     Route::get($admin . '/admin/wahana/', [WahanaController::class, 'index']);
     Route::post($admin . '/admin/wahana/store', [WahanaController::class, 'store']);
-    Route::put($admin . '/admin/wahana/update', [WahanaController::class, 'update']);
+    Route::put($admin . '/admin/wahana/update/{id}', [WahanaController::class, 'update']);
     Route::delete($admin . '/admin/wahana/destroy', [WahanaController::class, 'destroy']);
 
     Route::get($admin . '/admin/fasilitas/', [FasilitasController::class, 'index']);
     Route::post($admin . '/admin/fasilitas/store', [FasilitasController::class, 'store']);
-    Route::put($admin . '/admin/fasilitas/update', [FasilitasController::class, 'update']);
+    Route::post($admin . '/admin/fasilitas/update/{id}', [FasilitasController::class, 'update']);
     Route::delete($admin . '/admin/fasilitas/destroy', [FasilitasController::class, 'destroy']);
 
     Route::get($admin . '/admin/beranda/', [BerandaController::class, 'index']);
@@ -66,10 +66,14 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post($admin . '/admin/beranda/store', [BerandaController::class, 'store']);
     Route::post($admin . '/admin/beranda/update/', [BerandaController::class, 'update']);
     Route::delete($admin . '/admin/beranda/destroy', [BerandaController::class, 'destroy']);
+
+    Route::get($admin . '/admin/harga_tiket/', [HargaTiketController::class, 'index']);
+    Route::post($admin . '/admin/harga_tiket/', [HargaTiketController::class, 'store']);
+    Route::post($admin . '/admin/harga_tiket/{id}', [HargaTiketController::class, 'update']);
 });
 Route::prefix('password')->group(function (){
     Route::post('forgot_password', [UserController::class, 'forgotPassword']);
-    Route::put('change_password/{id}', [UserController::class, 'changePassword']);
+    Route::post('change_password/{id}', [UserController::class, 'changePassword']);
 });
 
 

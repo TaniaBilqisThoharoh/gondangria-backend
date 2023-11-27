@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Wahana;
 use Illuminate\Http\Request;
+use Carbon\Carbon;  
 
 class WahanaController extends Controller
 {
@@ -17,18 +18,34 @@ class WahanaController extends Controller
     {
         $this->validate($request, [
             'nama' => 'required|string',
-            'gambar' => 'required|string',
+            'gambar' => 'required|mimes:jpeg,jpg,png,gif',
             'deskripsi' => 'required|string',
         ]);
-
-        $wahana = new Wahana([
+                $wahana = new Wahana([
             'nama' => $request->input('nama'),
-            'gambar' => $request->input('gambar'),
+            'gambar' => $request->gambar,
             'deskripsi' => $request->input('deskripsi'),
         ]);
+        
+        $name =  Carbon::now()->timestamp . $request->file('gambar')->getClientOriginalName();
 
+        $path = $request->file('gambar');
+        if(!$path){
+            return response()->json(['message'=>'Data not found'], 404);       
+        }
+        $dest = public_path('images');
+        // $path->move($dest . $path->getClientOriginalName());
+         $path->move(public_path('images'), $name);
+        
+        if ($request->hasFile('gambar')) {
+            $wahana->gambar = $name;
+        }
+
+        // $beranda->hero = $path;
+        // Any other fields to be saved here..
+        // dd($path);
         $wahana->save();
-
+        
         return response()->json(['message' => 'Wahana ditambahkan'], 201);
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fasilitas;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class FasilitasController extends Controller
 {
@@ -15,46 +16,84 @@ class FasilitasController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $this->validate($request, [
             'nama' => 'required|string',
-            'gambar' => 'required|string',
+            'gambar' => 'required|mimes:jpeg,jpg,png,gif',
             'deskripsi' => 'required|string',
         ]);
+            $fasilitas= new Fasilitas([
+            'nama' => $request->input('nama'),
+            'gambar' => $request->gambar,
+            'deskripsi' => $request->input('deskripsi'),
+        ]);
+        
+        $name =  Carbon::now()->timestamp . $request->file('gambar')->getClientOriginalName();
 
-        Fasilitas::create($data);
+        $path = $request->file('gambar');
+        if(!$path){
+            return response()->json(['message'=>'Data not found'], 404);       
+        }
+        $dest = public_path('images');
+        // $path->move($dest . $path->getClientOriginalName());
+         $path->move(public_path('images'), $name);
+        
+        if ($request->hasFile('gambar')) {
+            $fasilitas->gambar = $name;
+        }
 
-        return response()->json(['message' => 'Fasilitas ditambahkan'], 201);
+        // $beranda->hero = $path;
+        // Any other fields to be saved here..
+        // dd($path);
+        $fasilitas->save();
+        return response()->json(['message'=> 'New fasilitas succesfully created'], 201);
     }
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        
+        $valid = $request->validate([
             'nama' => 'string',
-            'gambar' => 'string',
-            'deskripsi' => 'string',
+            'gambar' => 'nullable|mimes:jpeg,jpg,png,gif',
+            'deskripsi' => 'nullable|string',
         ]);
 
+
+        if($valid){
+        
         $fasilitas = Fasilitas::find($id);
-
-        if (!$fasilitas) {
-            return response()->json(['message' => 'Fasilitas tidak ditemukan'], 404);
-        }
-
-        if ($request->has('nama')) {
+        
+        if($request->has('nama')){
             $fasilitas->nama = $request->input('nama');
+         }
+        
+        if($request->hasFile('gambar')){
+        $name =  Carbon::now()->timestamp . $request->file('gambar')->getClientOriginalName();
+            
+        $path = $request->file('gambar');
+        if(!$path){
+            return response()->json(['message'=>'Data not found'], 404);       
         }
-
-        if ($request->has('gambar')) {
-            $fasilitas->gambar = $request->input('gambar');
+        
+        $dest = public_path('images');
+        // $path->move($dest . $path->getClientOriginalName());
+        $path->move(public_path('images'), $name);
+        $fasilitas->gambar=$name;
+        }   
+        
+        if($request->has('deskripsi')){
+        $fasilitas->deskripsi = $request->input('deskripsi');
         }
-
-        if ($request->has('deskripsi')) {
-            $fasilitas->deskripsi = $request->input('deskripsi');
-        }
-
+       
+        // $beranda->hero = $path;
+        // Any other fields to be saved here..
+        // dd($path);
+         
         $fasilitas->save();
-
-        return response()->json(['message' => 'Fasilitas diperbarui'], 200);
+    }else{
+        dd($request);
+    }
+        return response()->json(['message' => 'Fasilitas berhasil diedit'], 200);
+    
     }
 
     public function destroy($id)
