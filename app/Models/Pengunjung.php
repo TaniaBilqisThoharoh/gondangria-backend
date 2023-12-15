@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pengunjung extends Model
 {
     use HasFactory;
-    protected $fillable = ['nama', 'email', 'no_telepon'];
+    protected $fillable = ['order_id', 'nama', 'email', 'no_telepon', 'tanggal', 'subtotal', 'jumlah_tiket'];
 
     public function tiket() {
         return $this->hasMany(Tiket::class);

@@ -10,8 +10,13 @@ class HargaTiketController extends Controller
 
     public function index()
     {
-        $harga_tiket = HargaTiket::first();
-        return response()->json($harga_tiket, 200);
+        $harga_tiket = HargaTiket::all();
+        // dd($harga_tiket);
+        $data = [
+            'data' => $harga_tiket,
+            'message' => 'Selamat sukses'
+        ];
+        return response()->json($data, 200);
     }
     
     public function store(Request $request){
