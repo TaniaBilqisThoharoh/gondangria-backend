@@ -50,10 +50,10 @@ class FasilitasController extends Controller
 
     public function update(Request $request, $id)
     {
-        
+        // dd($request);
         $valid = $request->validate([
             'nama' => 'string',
-            'gambar' => 'nullable|mimes:jpeg,jpg,png,gif',
+            'gambar' => 'nullable',
             'deskripsi' => 'nullable|string',
         ]);
 

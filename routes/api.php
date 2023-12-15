@@ -25,6 +25,7 @@ use App\Http\Controllers\HargaTiketController;
 // });
 
 
+
 // Rute untuk Wahana
 Route::get('wahana', [WahanaController::class, 'index']);
 
@@ -36,6 +37,8 @@ Route::get('fasilitas', [FasilitasController::class, 'index']);
 Route::get('beranda', [BerandaController::class, 'index']);
 
 // Rute untuk Tiket (disesuaikan dengan kebutuhan)
+
+Route::get('harga_tiket', [HargaTiketController::class, 'index']);
 Route::get('tiket', [TiketController::class, 'index']);
 Route::post('tiket', [TiketController::class, 'store']);
 Route::post('tiket/notification', [TiketController::class, 'notification']);
@@ -43,7 +46,7 @@ Route::post('tiket/notification', [TiketController::class, 'notification']);
 // Rute untuk Pengunjung (disesuaikan dengan kebutuhan)
 Route::get('pengunjung', [PengunjungController::class, 'index']);
 Route::post('pengunjung', [PengunjungController::class, 'store']);
-
+Route::post('checkout-midtrans', [PengunjungController::class, 'checkoutMidtrans']);
 
 // Rute untuk User (Admin)
 
@@ -59,7 +62,7 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get($admin . '/admin/fasilitas/', [FasilitasController::class, 'index']);
     Route::post($admin . '/admin/fasilitas/store', [FasilitasController::class, 'store']);
     Route::post($admin . '/admin/fasilitas/update/{id}', [FasilitasController::class, 'update']);
-    Route::delete($admin . '/admin/fasilitas/destroy', [FasilitasController::class, 'destroy']);
+    Route::delete($admin . '/admin/fasilitas/destroy/{id}', [FasilitasController::class, 'destroy']);
 
     Route::get($admin . '/admin/beranda/', [BerandaController::class, 'index']);
     // Route::put($admin . '/admin/beranda/{$id}', [BerandaController::class, 'update']);
@@ -67,13 +70,16 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post($admin . '/admin/beranda/update/', [BerandaController::class, 'update']);
     Route::delete($admin . '/admin/beranda/destroy', [BerandaController::class, 'destroy']);
 
+    Route::get($admin . 'harga_tiket', [HargaTiketController::class, 'index']);
     Route::get($admin . '/admin/harga_tiket/', [HargaTiketController::class, 'index']);
     Route::post($admin . '/admin/harga_tiket/', [HargaTiketController::class, 'store']);
     Route::post($admin . '/admin/harga_tiket/{id}', [HargaTiketController::class, 'update']);
 });
+
 Route::prefix('password')->group(function (){
     Route::post('forgot_password', [UserController::class, 'forgotPassword']);
-    Route::post('change_password/{id}', [UserController::class, 'changePassword']);
+    Route::post('validasi', [UserController::class, 'validasi_password']);
+    Route::post('change_password', [UserController::class, 'changePassword']);
 });
 
 

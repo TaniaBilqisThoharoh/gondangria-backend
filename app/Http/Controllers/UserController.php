@@ -7,6 +7,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\DB;
+use Mail;
+use App\Mail\NotifMail;
+use Illuminate\Support\Carbon;
 
 
 class UserController extends Controller {
@@ -56,7 +60,8 @@ class UserController extends Controller {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            // 'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'expires_in' => 60 * 60 * 24,
         ]);
     }
 
@@ -91,29 +96,64 @@ class UserController extends Controller {
         $isExist = User::where('email', $request->email)->first();
         
         if($isExist){
-            return response()->json(['message'=> 'user exists'], 200);
+            $token = rand(100000, 999999);
+            $mailData = [
+                'nama' => 'Hallo '. $isExist->username,
+                'token' => $token
+            ];
+             
+            Mail::to($request->email)->send(new NotifMail($mailData));
+           
+            $data = DB::table('password_reset_tokens')->insert([
+                'email' => $request->email,
+                'token' => $token
+            ]);
+            
+            return response()->json(['message'=> 'Email telah terkirim, mohon periksa email dan folder spam anda'], 200);
             
         }else{
             
-            return response()->json(['message'=> 'user not found'], 404);
+            return response()->json(['message'=> 'Mohon maaf email ini tidak terdaftar'], 404);
         }
-        }
-    
-        public function changePassword(Request $request, $id){
+    }
+
+    // dalam isi requestnya ada email sama token
+    public function validasi_password(Request $request){
             
-        $pass = $request->input('pw');
-        $user = User::find($id);
+        $isValid = DB::table('password_reset_tokens')
+            ->where([
+                ['email', $request->email],
+                ['token', $request->token]
+            ])
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        if($isValid->created_at > Carbon::now()->addHour()) {
+            return response()->json(['message'=>'Token expired'], 401);
+        }
+        
+        if($isValid){
+            return response()->json(['message'=>'Token valid'], 200);
+        } else {
+            return response()->json(['message'=>'Token tidak valid'], 401);
+        }        
+    }
+    
+    public function changePassword(Request $request){
+            
+        $pass = $request->input('password');
+        $user = User::where('email', $request->email)->first();
         $user->password = bcrypt($pass);
         $user->save();
     
-        return response()->json(['message'=>'password successfully changed'], 200);
+        return response()->json(['message'=>'Password berhasil diubah'], 200);
         
     }
 
     public function logout() {
         JWTAuth::invalidate(JWTAuth::getToken());
 
-        return response()->json(['message' => 'User logged out successfully']);
+        return response()->json(['message' => 'User berhasil log out']);
 
     }
 
