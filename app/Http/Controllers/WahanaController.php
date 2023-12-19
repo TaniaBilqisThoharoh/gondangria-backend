@@ -51,11 +51,14 @@ class WahanaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        $valid = $request->validate([
             'nama' => 'string',
-            'gambar' => 'string',
-            'deskripsi' => 'string',
+            'gambar' => 'nullable',
+            'deskripsi' => 'nullable|string',
         ]);
+
+
+        if($valid){
 
         $wahana = Wahana::find($id);
 
@@ -67,16 +70,29 @@ class WahanaController extends Controller
             $wahana->nama = $request->input('nama');
         }
 
-        if ($request->has('gambar')) {
-            $wahana->gambar = $request->input('gambar');
-        }
+        if($request->hasFile('gambar')){
+            $name =  Carbon::now()->timestamp . $request->file('gambar')->getClientOriginalName();
+                
+            $path = $request->file('gambar');
+            
+            if(!$path){
+                return response()->json(['message'=>'Data not found'], 404);       
+            }
+            
+            $dest = public_path('images');
+            // $path->move($dest . $path->getClientOriginalName());
+            $path->move(public_path('images'), $name);
+            $wahana->gambar=$name;
+            }   
 
         if ($request->has('deskripsi')) {
             $wahana->deskripsi = $request->input('deskripsi');
         }
 
         $wahana->save();
-
+    }else{
+        dd($request);
+    }
         return response()->json(['message' => 'Wahana diperbarui'], 200);
     }
 

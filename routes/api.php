@@ -56,7 +56,7 @@ Route::middleware('jwt.auth')->group(function () {
     
     Route::get($admin . '/admin/wahana/', [WahanaController::class, 'index']);
     Route::post($admin . '/admin/wahana/store', [WahanaController::class, 'store']);
-    Route::put($admin . '/admin/wahana/update/{id}', [WahanaController::class, 'update']);
+    Route::post($admin . '/admin/wahana/update/{id}', [WahanaController::class, 'update']);
     Route::delete($admin . '/admin/wahana/destroy', [WahanaController::class, 'destroy']);
 
     Route::get($admin . '/admin/fasilitas/', [FasilitasController::class, 'index']);
